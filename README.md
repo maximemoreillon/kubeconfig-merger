@@ -1,3 +1,9 @@
 # Kubeconfig-merger
 
-Merges discrete kubeconfig files under `~/.kube/config.d/` into `~/.kube/config`.
+Merges discrete kubeconfig into `~/.kube/config`.
+
+## Usage
+
+```bash
+./kubeconfig-merger -source ~/.kube/config.d/
+```
