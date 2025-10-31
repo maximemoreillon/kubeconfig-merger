@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/fs"
 	"log"
 	"os"
@@ -12,10 +13,8 @@ import (
 func findYAMLFiles(root string) ([]string, error) {
 	var yamlFiles []string
 
-	// filepath.WalkDir walks the file tree rooted at root
 	err := filepath.WalkDir(root, func(s string, d fs.DirEntry, e error) error {
 		if e != nil {
-			// Return the error to stop the walk or handle it as needed
 			return e
 		}
 
@@ -39,31 +38,39 @@ func findYAMLFiles(root string) ([]string, error) {
 
 func main () {
 
-	// TODO: Have this customizable
-	HOME := os.Getenv("HOME")
-	kubePath := filepath.Join(HOME, ".kube")
-	confiDotDPath := filepath.Join(kubePath, "config.d")
+	
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Printf("Error getting user home directory: %v\n", err)
+	}
+
+	kubePath := filepath.Join(homePath, ".kube")
+	configDPath := filepath.Join(kubePath, "config.d") // TODO: Have this customizable
 	outputPath := filepath.Join(kubePath, "config")
 
-	yamlFiles, err := findYAMLFiles(confiDotDPath)
+	fmt.Printf("Merging files at %v into %v\n", configDPath, outputPath)
+
+	yamlFiles, err := findYAMLFiles(configDPath)
 	if err != nil {
-		log.Fatalf("Error finding YAML files: %v", err)
+		log.Printf("Error finding YAML files: %v\n", err)
 	}
 
 	err = os.Setenv("KUBECONFIG", strings.Join(yamlFiles, ":"))
 	if err != nil {
-		log.Fatalf("Error setting environment variable: %v", err)
+		fmt.Printf("Error setting environment variable: %v\n", err)
 	}
 
 	cmd := exec.Command("kubectl", "config", "view", "--merge", "--flatten")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatalf("Error executing kubectl command: %v\nOutput: %s", err, output)
+		fmt.Printf("Error executing kubectl command: %v\nOutput: %s", err, output)
 	}
 
 	err = os.WriteFile(outputPath, []byte(output), 0644)
 	if err != nil {
-		log.Fatalf("Failed to write file: %v", err)
+		fmt.Printf("Failed to write file: %v\n", err)
 	}
+
+	fmt.Printf("Generated %v \n", outputPath)
 
 }
