@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io/fs"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -48,12 +47,14 @@ func main () {
 	configDPath := filepath.Join(kubePath, "config.d") // TODO: Have this customizable
 	outputPath := filepath.Join(kubePath, "config")
 
-	fmt.Printf("Merging files at %v into %v\n", configDPath, outputPath)
+	fmt.Printf("Merging YAML files at %v into %v\n", configDPath, outputPath)
 
 	yamlFiles, err := findYAMLFiles(configDPath)
 	if err != nil {
-		log.Printf("Error finding YAML files: %v\n", err)
+		fmt.Printf("Error finding YAML files: %v\n", err)
 	}
+
+	fmt.Printf("Found %d files \n", len(yamlFiles))
 
 	err = os.Setenv("KUBECONFIG", strings.Join(yamlFiles, ":"))
 	if err != nil {
