@@ -1,0 +1,50 @@
+name: Build Go and Zip Binaries
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - created
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: [amd64, arm64]
+        exclude:
+          - goos: windows
+            goarch: arm64
+          - goos: darwin
+            goarch: arm64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build Go application
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          OUTPUT_NAME="kubeconfig-merger-${{ matrix.goos }}-${{ matrix.goarch }}"
+          go build -o "./bin/${OUTPUT_NAME}" .
+
+      - name: Create zip archive
+        run: |
+          cd ./bin
+          zip -j "kubeconfig-merger-${{ matrix.goos }}-${{ matrix.goarch }}.zip" "kubeconfig-merger-${{ matrix.goos }}-${{ matrix.goarch }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kubeconfig-merger-binaries-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: ./bin/kubeconfig-merger-${{ matrix.goos }}-${{ matrix.goarch }}.zip
