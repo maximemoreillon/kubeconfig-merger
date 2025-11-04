@@ -66,7 +66,7 @@ func main () {
 
 	fmt.Printf("Found %d files \n", len(yamlFiles))
 
-	err = os.Setenv("KUBECONFIG", strings.Join(yamlFiles, ":"))
+	err = os.Setenv("KUBECONFIG", strings.Join(yamlFiles, ";"))
 	if err != nil {
 		fmt.Printf("Error setting environment variable: %v\n", err)
 		return
