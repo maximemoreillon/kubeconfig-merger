@@ -18,7 +18,6 @@ func findYAMLFiles(root string) ([]string, error) {
 			return e
 		}
 
-		// Check if it's a file and has the correct extension
 		if !d.IsDir() {
 			ext := strings.ToLower(filepath.Ext(d.Name()))
 			if ext == ".yaml" || ext == ".yml" {
