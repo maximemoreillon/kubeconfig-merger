@@ -6,5 +6,11 @@ By default, this application will look for kubeconfig files in the `~/.kube/conf
 ## Usage
 
 ```bash
-./kubeconfig-merger -source ~/.kube/config.d/
+./kubeconfig-merger
+```
+
+Specifying a source directory other than `~/.kube/config.d`
+
+```bash
+./kubeconfig-merger -source /path/to/config/dir
 ```
