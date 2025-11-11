@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -32,6 +33,22 @@ func findYAMLFiles(root string) ([]string, error) {
 	}
 
 	return yamlFiles, nil
+}
+
+func getDelimiter () (string) {
+	var delimiter string
+	switch runtime.GOOS {
+	case "windows":
+		delimiter = ";"
+		fmt.Printf("OS detected as Windows, using '%s' as delimiter\n", delimiter)
+	case "linux":
+		delimiter = ":"
+		fmt.Printf("OS detected as Linux. using '%s as delimiter\n", delimiter)
+	default:
+		delimiter = ":"
+		fmt.Printf("Unknown OS, using '%s' as delimiter\n", delimiter)
+	}
+	return delimiter
 }
 
 
@@ -65,7 +82,8 @@ func main () {
 
 	fmt.Printf("Found %d files \n", len(yamlFiles))
 
-	err = os.Setenv("KUBECONFIG", strings.Join(yamlFiles, ";"))
+	delimiter := getDelimiter()
+	err = os.Setenv("KUBECONFIG", strings.Join(yamlFiles, delimiter))
 	if err != nil {
 		fmt.Printf("Error setting environment variable: %v\n", err)
 		return
