@@ -96,7 +96,7 @@ func main () {
 		return
 	}
 
-	err = os.WriteFile(outputPath, []byte(output), 0644)
+	err = os.WriteFile(outputPath, []byte(output), 0600)
 	if err != nil {
 		fmt.Printf("Failed to write file: %v\n", err)
 		return
